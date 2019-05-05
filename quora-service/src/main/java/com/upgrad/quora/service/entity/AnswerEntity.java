@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "answer", schema = "quora")
+@Table(name = "answer")
 public class AnswerEntity implements Serializable {
 
 
