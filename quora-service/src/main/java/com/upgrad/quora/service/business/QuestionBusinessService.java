@@ -31,9 +31,6 @@ public class QuestionBusinessService {
 
         UserEntity userEntity = getUserFromToken(authorizationToken);
         questionEntity.setUser(userEntity);
-        LocalDateTime withoutTimezone = ZonedDateTime.now().toLocalDateTime();;
-        Timestamp timestamp = Timestamp.valueOf(withoutTimezone);
-        questionEntity.setDate(timestamp);
 
         questionDao.createQuestion(questionEntity);
 
@@ -55,6 +52,34 @@ public class QuestionBusinessService {
         if(questionEntity == null){
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
+        return questionEntity;
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity updateQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
+
+        UserEntity userEntity = getUserFromToken(authorizationToken);
+        questionEntity.setUser(userEntity);
+
+        questionDao.updateQuestion(questionEntity);
+
+        return questionEntity;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity deleteQuestion(final String uuid, final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
+
+        UserEntity userEntity = getUserFromToken(authorizationToken);
+        getUserFromToken(authorizationToken);
+
+        QuestionEntity questionEntity = questionDao.getQuestion(uuid);
+        if(questionEntity == null){
+            throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
+        }
+
+        questionDao.deleteQuestion(questionEntity);
+
         return questionEntity;
     }
 

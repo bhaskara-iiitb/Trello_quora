@@ -3,6 +3,7 @@ package com.upgrad.quora.api.controller;
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,12 +37,11 @@ public class QuestionController {
         questionEntity.setUuid(UUID.randomUUID().toString());
         questionEntity.setContent(questionRequest.getContent());
         Timestamp date = new Timestamp(System.currentTimeMillis());
-        String modifiedDate= new SimpleDateFormat("yyyy-MM-dd").format(date);
         questionEntity.setDate(date);
 
         final QuestionEntity createdQuestionEntity = questionBusinessService.createQuestion(questionEntity, authorization);
 
-        final QuestionResponse questionResponse = new QuestionResponse().id(createdQuestionEntity.getUuid()).status(null);
+        final QuestionResponse questionResponse = new QuestionResponse().id(createdQuestionEntity.getUuid()).status("QUESTION SUCCESSFULLY POSTED");
 
         return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
     }
@@ -49,7 +49,7 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET,
             path="/question/all",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestions(@PathVariable("questionId") final String questionId){
+    public ResponseEntity<Object> getAllQuestions(@RequestHeader("authorization") final String authorization){
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -58,22 +58,35 @@ public class QuestionController {
             path="/question/edit/{questionId}",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> editQuestionContent (@PathVariable("answerId") final String answerId){
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<QuestionResponse> editQuestionContent (final QuestionRequest questionRequest, @PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+        QuestionEntity questionEntity = new QuestionEntity();
+
+        questionEntity.setContent(questionRequest.getContent());
+        questionEntity.setUuid(questionId);
+        Timestamp date = new Timestamp(System.currentTimeMillis());
+        questionEntity.setDate(date);
+
+        QuestionEntity updatedQuestionEntity = questionBusinessService.updateQuestion(questionEntity, authorization);
+        QuestionResponse questionResponse = new QuestionResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.OK);
     }
 
 
     @RequestMapping(method = RequestMethod.DELETE,
             path="/question/delete/{questionId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> deleteQuestion(@PathVariable("questionId") final String questionId){
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<QuestionResponse> deleteQuestion(@PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity updatedQuestionEntity = questionBusinessService.deleteQuestion(questionId, authorization);
+        QuestionResponse questionResponse = new QuestionResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION DELETED SUCCESSFULLY");
+
+        return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET,
             path="question/all/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestionsByUser(@PathVariable("userId") final String userId){
+    public ResponseEntity<Object> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization){
         return new ResponseEntity(HttpStatus.OK);
     }
 }
