@@ -60,9 +60,12 @@ public class QuestionBusinessService {
     public QuestionEntity updateQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
 
         UserEntity userEntity = getUserFromToken(authorizationToken);
-        questionEntity.setUser(userEntity);
 
-        questionDao.updateQuestion(questionEntity);
+        if(questionEntity.getUser().getId() == userEntity.getId()) {
+            questionDao.updateQuestion(questionEntity);
+        } else {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
+        }
 
         return questionEntity;
     }
@@ -71,14 +74,26 @@ public class QuestionBusinessService {
     public QuestionEntity deleteQuestion(final String uuid, final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
 
         UserEntity userEntity = getUserFromToken(authorizationToken);
-        getUserFromToken(authorizationToken);
-
         QuestionEntity questionEntity = questionDao.getQuestion(uuid);
         if(questionEntity == null){
-            throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
         }
 
-        questionDao.deleteQuestion(questionEntity);
+        if(userEntity.getUuid().equals(questionEntity.getUser().getUuid()) || userEntity.getRole().equals("admin")) {
+            questionDao.deleteQuestion(questionEntity);
+        } else {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
+        }
+
+        return questionEntity;
+    }
+
+    public QuestionEntity getQuestion(String uuid) throws InvalidQuestionException {
+        QuestionEntity questionEntity = questionDao.getQuestion(uuid);
+
+        if(questionEntity == null){
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }
 
         return questionEntity;
     }
@@ -88,7 +103,7 @@ public class QuestionBusinessService {
 
         if(userAuthTokenEntity == null){
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-        } else if(userAuthTokenEntity.getLogoutAt() != null && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0){
+        } else if(userAuthTokenEntity.getLogoutAt() != null ){ // && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
         }
 
