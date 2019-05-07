@@ -18,6 +18,8 @@ import com.upgrad.quora.api.model.QuestionEditRequest;
 
 import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -49,8 +51,18 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET,
             path="/question/all",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestions(@RequestHeader("authorization") final String authorization){
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        List<QuestionEntity> questionEntities = questionBusinessService.getAllQuestions(authorization);
+        List<QuestionDetailsResponse> questionResponses = new ArrayList<>();
+        for (QuestionEntity questionEntity : questionEntities) {
+            questionResponses.add(
+                    new QuestionDetailsResponse()
+                            .id(questionEntity.getUuid())
+                            .content(questionEntity.getContent())
+            ) ;
+        }
+
+        return new ResponseEntity(questionResponses, HttpStatus.OK);
     }
 
 
@@ -86,7 +98,17 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET,
             path="question/all/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization){
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Object> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        List<QuestionEntity> questionEntities = questionBusinessService.getAllQuestionsByUser(userId, authorization);
+        List<QuestionDetailsResponse> questionResponses = new ArrayList<>();
+        for (QuestionEntity questionEntity : questionEntities) {
+            questionResponses.add(
+                    new QuestionDetailsResponse()
+                            .id(questionEntity.getUuid())
+                            .content(questionEntity.getContent())
+            ) ;
+        }
+
+        return new ResponseEntity(questionResponses, HttpStatus.OK);
     }
 }
