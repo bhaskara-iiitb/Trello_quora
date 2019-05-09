@@ -8,6 +8,7 @@ import com.upgrad.quora.service.business.UserBusinessService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,8 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST, path = "/signup",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest) {
+    public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest)
+                                                                throws SignUpRestrictedException {
 
 
         final UserEntity userEntity = new UserEntity();
@@ -57,8 +59,8 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, path="/signin",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
-
+    public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization)
+            throws AuthenticationFailedException {
         byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":");

@@ -19,7 +19,32 @@ public class UserDao {
     public UserEntity createUser(UserEntity userEntity) {
         entityManager.persist(userEntity);
         return userEntity;
+    }
 
+    public UserEntity getUserByUsername(final String username) {
+
+        try {
+            return entityManager.createNamedQuery(
+                    "userByUsername", UserEntity.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+        }
+        catch(NoResultException nre) {
+            return null;
+        }
+    }
+
+    public UserEntity getUserByEmail(final String email) {
+
+        try {
+            return entityManager.createNamedQuery(
+                    "userByEmail", UserEntity.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        }
+        catch(NoResultException nre) {
+            return null;
+        }
     }
 
     public UserEntity getUserByUsername(final String username) {
