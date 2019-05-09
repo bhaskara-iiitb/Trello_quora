@@ -10,13 +10,21 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users"/*, schema = "quora"*/) //schema not required for public DB schema
+@Table(name = "users")
 @NamedQueries(
         {
                 @NamedQuery(name = "userByUsername",
                         query = "select u from UserEntity u where u.username = :username")
         }
 )
+
+
+/*@NamedQueries(
+        {
+                @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid = :uuid"),
+                @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email =:email")
+        }
+)*/
 
 
 public class UserEntity implements Serializable {
