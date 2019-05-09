@@ -4,7 +4,6 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
-import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,32 +22,18 @@ public class UserBusinessService {
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserEntity signup(UserEntity userEntity) throws SignUpRestrictedException {
-        UserEntity existingUsername = userDao.getUserByUsername(userEntity.getUsername());
-        UserEntity existingEmailid = userDao.getUserByEmail(userEntity.getEmail());
-
-        if(existingUsername != null) {
-            throw new SignUpRestrictedException("SGR-001",
-                    "Try any other Username, this Username has already been taken");
-        }
-        if(existingEmailid !=null) {
-            throw new SignUpRestrictedException("SGR-002", "This user has already been registered, try with any other" +
-                    " emailId");
-        }
-
+    public UserEntity signup(UserEntity userEntity) {
         String[] encryptedText = passwordCryptographyProvider.encrypt(userEntity.getPassword());
         userEntity.setSalt(encryptedText[0]);
         userEntity.setPassword(encryptedText[1]);
-        UserEntity persistedUserEntity =  userDao.createUser(userEntity);
-
-        return persistedUserEntity;
+        return userDao.createUser(userEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
         UserEntity userEntity =  userDao.getUserByUsername(username);
         if(userEntity == null) {
-            throw new AuthenticationFailedException("ATH-001", "This username does not exist");
+            throw new AuthenticationFailedException("ATH-001", "User not found");
         }
 
         final String encryptedPassword = passwordCryptographyProvider.encrypt(password, userEntity.getSalt());
@@ -71,7 +56,7 @@ public class UserBusinessService {
             return userAuthEntity;
         }
         else {
-            throw new AuthenticationFailedException("ATH-002", "Password failed");
+            throw new AuthenticationFailedException("ATH-002", "Authentication failed");
         }
 
 
