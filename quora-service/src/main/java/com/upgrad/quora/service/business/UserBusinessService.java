@@ -18,7 +18,7 @@ public class UserBusinessService {
 
     @Autowired
     private UserDao userDao;
-
+  
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
@@ -90,5 +90,10 @@ public class UserBusinessService {
         userDao.updateUserAuth(userAuthEntity);
 
         return userAuthEntity;
+    }
+  
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserEntity signup(UserEntity userEntity) {
+        return userDao.createUser(userEntity);
     }
 }

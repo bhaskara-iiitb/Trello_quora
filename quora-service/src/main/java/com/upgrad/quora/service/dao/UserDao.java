@@ -13,6 +13,17 @@ import java.util.List;
 @Repository
 public class UserDao {
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+
+@Repository
+public class UserDao {
+    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -30,6 +41,10 @@ public class UserDao {
                     .getSingleResult();
         }
         catch(NoResultException nre) {
+    public UserEntity getUser(final String userUuid) {
+        try {
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException e) {
             return null;
         }
     }
@@ -43,16 +58,18 @@ public class UserDao {
                     .getSingleResult();
         }
         catch(NoResultException nre) {
+        try {
+            return entityManager.createNamedQuery("userByEmail", UserEntity.class).setParameter("email", email).getSingleResult();
+        } catch (NoResultException e) {
             return null;
         }
     }
-
-
+      
     public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
         entityManager.persist(authTokenEntity);
         return authTokenEntity;
     }
-
+      
     public UserAuthEntity getUserAuthToken(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
@@ -64,5 +81,18 @@ public class UserDao {
 
     public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
         entityManager.merge(updatedUserAuthEntity);
+    }
+      
+    public void updateUser(final UserEntity updateUserEntity) {
+        entityManager.merge(updateUserEntity);
+    }
+
+
+    public UserAuthEntity getUserAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthTokenByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

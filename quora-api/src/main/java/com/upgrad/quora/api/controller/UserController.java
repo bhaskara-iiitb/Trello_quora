@@ -12,6 +12,8 @@ import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import com.upgrad.quora.service.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +37,6 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest)
                                                                 throws SignUpRestrictedException {
-
-
         final UserEntity userEntity = new UserEntity();
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
