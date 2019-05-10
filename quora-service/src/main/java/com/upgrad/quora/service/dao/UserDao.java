@@ -65,7 +65,6 @@ public class UserDao {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
         } catch (NoResultException nre) {
-
             return null;
         }
     }
@@ -77,7 +76,15 @@ public class UserDao {
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
     }
-
+  
+    public UserAuthEntity getUserAuth(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+  
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
     }
