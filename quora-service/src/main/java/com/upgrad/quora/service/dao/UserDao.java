@@ -47,22 +47,22 @@ public class UserDao {
         }
     }
 
-    public UserEntity getUserByUsername(final String username) {
-
-        try {
-            return entityManager.createNamedQuery(
-                    "userByUsername", UserEntity.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
-        }
-        catch(NoResultException nre) {
-            return null;
-        }
-    }
 
     public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
         entityManager.persist(authTokenEntity);
         return authTokenEntity;
     }
 
+    public UserAuthEntity getUserAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException nre) {
+
+            return null;
+        }
+    }
+
+    public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
+        entityManager.merge(updatedUserAuthEntity);
+    }
 }
