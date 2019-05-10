@@ -1,12 +1,12 @@
 package com.upgrad.quora.api.controller;
 
-
 import com.upgrad.quora.api.model.*;
 
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AnswerNotFoundException;
+
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 
 import com.upgrad.quora.service.exception.InvalidQuestionException;
@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 
 @RestController
@@ -102,7 +103,7 @@ public class AnswerController {
     @RequestMapping(method = RequestMethod.GET,
             path="answer/all/{questionId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllAnswerToQuestion(@PathVariable("questionId") final String questionUuid) throws  InvalidQuestionException {
+        public ResponseEntity<Object> getAllAnswerToQuestion(@PathVariable("questionId") final String questionUuid) throws  InvalidQuestionException {
         // First get question using questionUuid, then find the questionId and for that question Id get all the answers.
         QuestionEntity quesEntity = questionBusinessService.getQuestion(questionUuid);
 
