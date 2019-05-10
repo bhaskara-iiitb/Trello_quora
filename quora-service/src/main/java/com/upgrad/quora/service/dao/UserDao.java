@@ -52,4 +52,24 @@ public class UserDao {
         return authTokenEntity;
     }
 
+    public UserEntity deleteUser(UserEntity userEntity) {
+        entityManager.remove(userEntity);
+        return userEntity;
+    }
+
+    public UserEntity getUser(final String userUuid) {
+        try {
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public UserAuthEntity getUserAuth(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
