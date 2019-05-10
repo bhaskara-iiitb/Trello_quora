@@ -43,7 +43,6 @@ public class UserDao {
         }
     }
 
-
     public UserEntity getUserByEmail(final String email) {
 
         try {
@@ -56,7 +55,7 @@ public class UserDao {
             return null;
         }
     }
-      
+  
     public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
         entityManager.persist(authTokenEntity);
         return authTokenEntity;
