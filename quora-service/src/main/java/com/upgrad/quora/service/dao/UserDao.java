@@ -28,8 +28,7 @@ public class UserDao {
                     "userByUsername", UserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult();
-        }
-        catch(NoResultException nre) {
+        } catch (NoResultException nre) {
             return null;
         }
     }
@@ -41,8 +40,7 @@ public class UserDao {
                     "userByEmail", UserEntity.class)
                     .setParameter("email", email)
                     .getSingleResult();
-        }
-        catch(NoResultException nre) {
+        } catch (NoResultException nre) {
             return null;
         }
     }
@@ -52,4 +50,31 @@ public class UserDao {
         return authTokenEntity;
     }
 
+
+    /*
+        getUserAuthToken - This Method will return the AuthToken for the Signed In User
+     */
+    public UserAuthEntity getUserAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException nre) {
+
+            return null;
+        }
+    }
+
+    /*
+        getUserByUuid - Get UserEntity Object from its UUID
+     */
+
+    public UserEntity getUserByUuid(final String uuid) {
+        try{
+            return entityManager.createNamedQuery("getUserByUuid", UserEntity.class).setParameter("uuid", uuid).getSingleResult();
+        }
+        catch(NoResultException e)
+        {
+            return null;
+        }
+
+    }
 }
