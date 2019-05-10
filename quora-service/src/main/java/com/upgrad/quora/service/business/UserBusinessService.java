@@ -75,5 +75,39 @@ public class UserBusinessService {
         }
 
 
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
+        UserEntity userEntity =  userDao.getUserByUsername(username);
+        if(userEntity == null) {
+            throw new AuthenticationFailedException("ATH-001", "User not found");
+        }
+
+        final String encryptedPassword = passwordCryptographyProvider.encrypt(password, userEntity.getSalt());
+        if(encryptedPassword.equals(userEntity.getPassword())) {
+            JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
+            UserAuthEntity userAuthEntity = new UserAuthEntity();
+            userAuthEntity.setUser(userEntity);
+
+            final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime expiresAt = now.plusHours(1);
+
+            userAuthEntity.setAccessToken(jwtTokenProvider.generateToken(userEntity.getUuid(), now, expiresAt));
+            userAuthEntity.setLoginAt(now);
+            userAuthEntity.setExpiresAt(expiresAt);
+            userAuthEntity.setLoginAt(now);
+            userAuthEntity.setUuid(userEntity.getUuid());
+            userDao.createAuthToken(userAuthEntity);
+
+
+            return userAuthEntity;
+        }
+        else {
+            throw new AuthenticationFailedException("ATH-002", "Authentication failed");
+        }
+
+
     }
 }

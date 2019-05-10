@@ -53,15 +53,16 @@ public class UserController {
         final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
 
         SignupUserResponse signupUserResponse =
-                     new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+                     new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER Santosin SUCCESSFULLY REGISTERED");
         return new ResponseEntity<SignupUserResponse>(signupUserResponse, HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.POST, path="/signin",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization)
-            throws AuthenticationFailedException {
-        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+
+    public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
+
+        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[0]);
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":");
 
