@@ -13,6 +13,8 @@ import java.io.Serializable;
 @Table(name = "users"/*, schema = "quora"*/) //schema not required for public DB schema
 @NamedQueries(
         {
+                @NamedQuery(name = "getUserByUuid",
+                        query = "select u from UserEntity u where u.uuid = :uuid"),
                 @NamedQuery(name = "userByUsername",
                         query = "select u from UserEntity u where u.username = :username"),
                 @NamedQuery(name = "userByEmail",
