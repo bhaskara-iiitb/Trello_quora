@@ -21,7 +21,7 @@ public class UserDao {
         entityManager.persist(userEntity);
         return userEntity;
     }
-
+  
     public UserEntity getUserByUsername(final String username) {
 
         try {
@@ -74,6 +74,10 @@ public class UserDao {
         entityManager.merge(updatedUserAuthEntity);
     }
       
+    public void updateUser(final UserEntity updateUserEntity) {
+        entityManager.merge(updateUserEntity);
+    }
+
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
     }

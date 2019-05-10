@@ -40,6 +40,7 @@ public class QuestionBusinessService {
     public List<QuestionEntity> getAllQuestions (final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
         getUserFromToken(authorizationToken);
         List<QuestionEntity> questionEntity = questionDao.getQuestions();
+      
         if(questionEntity.size() == 0){
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
@@ -49,6 +50,7 @@ public class QuestionBusinessService {
     public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
         getUserFromToken(authorizationToken);
         List<QuestionEntity> questionEntity = questionDao.getQuestionsByUser(uuid);
+      
         if(questionEntity.size() == 0){
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
