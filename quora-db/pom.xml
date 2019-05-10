@@ -33,8 +33,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-
-
                 <version>2.7</version>
                 <configuration>
                     <delimiters>
@@ -73,10 +71,7 @@
                         <artifactId>postgresql</artifactId>
                         <version>${postgresql.driver.version}</version>
                     </dependency>
-
-
                 </dependencies>
-
                 <configuration>
                     <driver>${postgresql.driver.name}</driver>
                     <url>jdbc:postgresql://${server.host}:${server.port}/${database.name}</url>
