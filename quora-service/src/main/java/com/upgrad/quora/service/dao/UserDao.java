@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Repository
 public class UserDao {
-
+    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -34,6 +35,14 @@ public class UserDao {
         }
     }
 
+    public UserEntity getUser(final String userUuid) {
+        try {
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
     public UserEntity getUserByEmail(final String email) {
 
         try {
@@ -46,10 +55,26 @@ public class UserDao {
             return null;
         }
     }
-
+  
     public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
         entityManager.persist(authTokenEntity);
         return authTokenEntity;
     }
+      
+    public UserAuthEntity getUserAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException nre) {
 
+            return null;
+        }
+    }
+
+    public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
+        entityManager.merge(updatedUserAuthEntity);
+    }
+      
+    public void updateUser(final UserEntity updateUserEntity) {
+        entityManager.merge(updateUserEntity);
+    }
 }
