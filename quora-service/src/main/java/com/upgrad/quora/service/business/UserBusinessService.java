@@ -91,9 +91,4 @@ public class UserBusinessService {
 
         return userAuthEntity;
     }
-  
-    @Transactional(propagation = Propagation.REQUIRED)
-    public UserEntity signup(UserEntity userEntity) {
-        return userDao.createUser(userEntity);
-    }
 }
