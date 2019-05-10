@@ -1,5 +1,6 @@
 package com.upgrad.quora.service.dao;
 
+import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,10 @@ public class UserDao {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    public UserEntity deleteUser(UserEntity userEntity) {
+        entityManager.remove(userEntity);
+        return userEntity;
     }
 }
