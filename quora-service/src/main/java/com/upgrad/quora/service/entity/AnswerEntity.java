@@ -13,12 +13,13 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "answer")
-/*@NamedQueries(
+@NamedQueries(
         {
-                @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid = :uuid"),
-                @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email =:email")
+                @NamedQuery(name = "answerByAnswerUuid", query = "select u from AnswerEntity u where u.uuid = :uuid"),
+                @NamedQuery(name = "answersByQuestionid", query = "select u from AnswerEntity u where u.question.id = :id")
         }
-)*/
+)
+
 public class AnswerEntity implements Serializable {
 
 
@@ -31,10 +32,10 @@ public class AnswerEntity implements Serializable {
     @Size(max = 60)
     private String uuid;
 
-    @Column(name = "ANSWER")
+    @Column(name = "ANS")
     @NotNull
     @Size(max = 500)
-    private String answer;
+    private String ans;
 
     @Column(name = "DATE")
     @NotNull
@@ -64,12 +65,12 @@ public class AnswerEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getAns() {
+        return ans;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setAns(String answer) {
+        this.ans = answer;
     }
 
     public Timestamp getDate() {
