@@ -43,7 +43,9 @@ public class UserBusinessService {
         UserEntity persistedUserEntity =  userDao.createUser(userEntity);
 
         return persistedUserEntity;
+
     }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
@@ -67,8 +69,6 @@ public class UserBusinessService {
             userAuthEntity.setLoginAt(now);
             userAuthEntity.setUuid(userEntity.getUuid());
             userDao.createAuthToken(userAuthEntity);
-
-
             return userAuthEntity;
         }
         else {

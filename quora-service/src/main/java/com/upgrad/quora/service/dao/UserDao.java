@@ -4,8 +4,11 @@ import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 
-import javax.persistence.*;
+
 
 
 
@@ -22,6 +25,7 @@ public class UserDao {
         return userEntity;
 
     }
+
 
     public UserEntity getUser(final String userUuid) {
         try {
@@ -42,6 +46,7 @@ public class UserDao {
         entityManager.merge(updateUserEntity);
 
     }
+
 
     public UserEntity getUserByUsername(final String username) {
 
@@ -84,6 +89,7 @@ public class UserDao {
     public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
         entityManager.merge(updatedUserAuthEntity);
     }
+
 
 }
 
