@@ -7,13 +7,11 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 @Repository
 public class UserDao {
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -29,7 +27,8 @@ public class UserDao {
                     "userByUsername", UserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult();
-        } catch (NoResultException nre) {
+        }
+        catch(NoResultException nre) {
             return null;
         }
     }
@@ -52,7 +51,8 @@ public class UserDao {
                     "userByEmail", UserEntity.class)
                     .setParameter("email", email)
                     .getSingleResult();
-        } catch (NoResultException nre) {
+        }
+        catch(NoResultException nre) {
             return null;
         }
     }
@@ -62,13 +62,20 @@ public class UserDao {
         return authTokenEntity;
     }
 
+    public UserEntity deleteUser(UserEntity userEntity) {
+        entityManager.remove(userEntity);
+        return userEntity;
+    }
+
+
     /*
         getUserAuthToken - This Method will return the AuthToken for the Signed In User
      */
     public UserAuthEntity getUserAuthToken(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
-        } catch (NoResultException nre) {
+        } 
+        catch (NoResultException nre) {
             return null;
         }
     }
@@ -80,4 +87,22 @@ public class UserDao {
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
     }
+
+    // DUPLICATE FUNCTIONALITY
+    // ALREADY TAKEN CARE BY EXISTING FUNCTION IN CODE
+	/*
+    public UserEntity getUser(final String userUuid) {
+        try {
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException e) {
+
+public UserAuthEntity getUserAuth(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+*/
+	
 }

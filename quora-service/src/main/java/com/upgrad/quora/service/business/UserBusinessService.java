@@ -81,7 +81,6 @@ public class UserBusinessService {
     /*
         getUserProfile -  This method will return the Details of the Signed in User
      */
-
     public UserEntity getUserProfile(final String userUuid, final String acesstoken) throws AuthorizationFailedException, UserNotFoundException {
 
         UserAuthEntity userAuthEntity = userDao.getUserAuthToken(acesstoken);
@@ -97,7 +96,7 @@ public class UserBusinessService {
             }
             return userEntity;
         }
-        
+
         throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
     }
 
@@ -114,6 +113,20 @@ public class UserBusinessService {
         userDao.updateUserAuth(userAuthEntity);
 
         return userAuthEntity;
+    }
+
+    public UserEntity getUserFromToken(String authorizationToken) throws AuthorizationFailedException {
+        UserAuthEntity userAuthEntity = userDao.getUserAuth(authorizationToken);
+
+        if(userAuthEntity == null){
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        } else if(userAuthEntity.getLogoutAt() != null ){ // && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0 // IS THIS COMMENTED TEXT A TODO? - NEED TO VALIDATE
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out");
+        }
+
+        UserEntity userEntity = userAuthEntity.getUser();
+
+        return userEntity;
     }
 
 }

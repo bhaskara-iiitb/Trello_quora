@@ -36,7 +36,7 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest)
-                                                                throws SignUpRestrictedException {
+            throws SignUpRestrictedException {
         final UserEntity userEntity = new UserEntity();
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
@@ -54,7 +54,7 @@ public class UserController {
         final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
 
         SignupUserResponse signupUserResponse =
-                     new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+                new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
         return new ResponseEntity<SignupUserResponse>(signupUserResponse, HttpStatus.CREATED);
     }
 
@@ -70,8 +70,8 @@ public class UserController {
         UserEntity userEntity = userAuthEntity.getUser();
 
         SigninResponse signinResponse = new SigninResponse()
-                                                .id(UUID.fromString(userEntity.getUuid()).toString())
-                                                .message("Authenticated successfully");
+                .id(UUID.fromString(userEntity.getUuid()).toString())
+                .message("Authenticated successfully");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token", userAuthEntity.getAccessToken());
