@@ -8,9 +8,12 @@ import com.upgrad.quora.service.business.UserBusinessService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import com.upgrad.quora.service.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +36,7 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest)
-                                                                throws SignUpRestrictedException {
-
-
+            throws SignUpRestrictedException {
         final UserEntity userEntity = new UserEntity();
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
@@ -53,7 +54,7 @@ public class UserController {
         final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
 
         SignupUserResponse signupUserResponse =
-                     new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+                new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
         return new ResponseEntity<SignupUserResponse>(signupUserResponse, HttpStatus.CREATED);
     }
 
@@ -69,8 +70,8 @@ public class UserController {
         UserEntity userEntity = userAuthEntity.getUser();
 
         SigninResponse signinResponse = new SigninResponse()
-                                                .id(UUID.fromString(userEntity.getUuid()).toString())
-                                                .message("Authenticated successfully");
+                .id(UUID.fromString(userEntity.getUuid()).toString())
+                .message("Authenticated successfully");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token", userAuthEntity.getAccessToken());
@@ -78,11 +79,14 @@ public class UserController {
         return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, path="/signout",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) {
 
-        SignoutResponse signoutResponse = null;
+    @RequestMapping(method = RequestMethod.POST, path = "/signout", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException {
+        UserAuthEntity userAuthEntity = userBusinessService.signout(authorization);
+
+        SignoutResponse signoutResponse = new SignoutResponse().id(userAuthEntity.getUuid()).message("SIGNED OUT SUCCESSFULLY'");
+
         return new ResponseEntity<SignoutResponse>(signoutResponse, HttpStatus.OK);
     }
+
 }

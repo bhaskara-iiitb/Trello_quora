@@ -12,7 +12,13 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "answer", schema = "quora")
+@Table(name = "answer")
+/*@NamedQueries(
+        {
+                @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid = :uuid"),
+                @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email =:email")
+        }
+)*/
 public class AnswerEntity implements Serializable {
 
 
