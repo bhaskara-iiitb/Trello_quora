@@ -39,10 +39,13 @@ public class AnswerBusinessService {
 
 
 
-    public AnswerEntity getAnswerByAnswerUuid(final String answerUuid, final String authorizationToken) throws AuthorizationFailedException {
+    public AnswerEntity getAnswerByAnswerUuid(final String answerUuid, final String authorizationToken) throws AuthorizationFailedException,AnswerNotFoundException {
 
         getUserFromToken(authorizationToken);
         AnswerEntity answerEntity = answerDao.getAnswerByUuid(answerUuid);
+        if(answerEntity == null){
+            throw new AnswerNotFoundException("ANS-001", "Entered Answer uuid does not exist");
+        }
         return answerEntity;
     }
 
@@ -82,7 +85,14 @@ public class AnswerBusinessService {
         return answerEntity;
     }
 
-    public List<AnswerEntity> getAllAnswersByQuestionId (final Integer id) throws InvalidQuestionException{
+    public List<AnswerEntity> getAllAnswersByQuestionId (final Integer id,final String authorizationToken) throws AuthorizationFailedException,InvalidQuestionException{
+        UserAuthEntity userAuthTokenEntity = userDao.getUserAuthToken(authorizationToken);
+
+        if(userAuthTokenEntity == null){
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        } else if(userAuthTokenEntity.getLogoutAt() != null ){ // && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
+        }
 
         List<AnswerEntity> answerEntities = answerDao.getAnswersByQuestionId(id);
         if(answerEntities == null){
