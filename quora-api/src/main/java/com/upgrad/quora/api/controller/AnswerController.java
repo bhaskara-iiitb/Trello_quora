@@ -40,13 +40,10 @@ public class AnswerController {
     private QuestionBusinessService questionBusinessService;
 
     @RequestMapping(method = RequestMethod.POST,
-            path="questions/{questionId}/answer/create",
+            path="question/{questionId}/answer/create",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-
     public ResponseEntity<AnswerResponse> createAnswer(@RequestHeader("authorization") final String authorization,@PathVariable("questionId") final String questionUuid,  AnswerRequest request) throws AuthorizationFailedException, InvalidQuestionException {
-
-
 
         QuestionEntity quesEntity = questionBusinessService.getQuestion(questionUuid);
 
@@ -69,7 +66,7 @@ public class AnswerController {
             path="answer/edit/{answerId}",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerEditResponse> editAnswerContent(@PathVariable("answerId") final String answerUuid, @RequestHeader("authorization") final String authorization, AnswerEditRequest editRequest)throws AuthorizationFailedException{
+    public ResponseEntity<AnswerEditResponse> editAnswerContent(@PathVariable("answerId") final String answerUuid, @RequestHeader("authorization") final String authorization, AnswerEditRequest editRequest)throws AuthorizationFailedException,AnswerNotFoundException{
         // 1. First Get the Answer.
         // 2. Then update the Answer Content
         // Finally update Answer in DB.
@@ -103,12 +100,12 @@ public class AnswerController {
     @RequestMapping(method = RequestMethod.GET,
             path="answer/all/{questionId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-        public ResponseEntity<Object> getAllAnswerToQuestion(@PathVariable("questionId") final String questionUuid) throws  InvalidQuestionException {
+        public ResponseEntity<Object> getAllAnswerToQuestion( @RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionUuid) throws  AuthorizationFailedException,InvalidQuestionException {
         // First get question using questionUuid, then find the questionId and for that question Id get all the answers.
         QuestionEntity quesEntity = questionBusinessService.getQuestion(questionUuid);
 
         // get all question by question ID
-        List<AnswerEntity> answerEntities = answerBusinessService.getAllAnswersByQuestionId(quesEntity.getId());
+        List<AnswerEntity> answerEntities = answerBusinessService.getAllAnswersByQuestionId(quesEntity.getId(),authorization);
 
         // Build the answer responses.
         List<AnswerDetailsResponse> answerDetailsResponses = new ArrayList<>();

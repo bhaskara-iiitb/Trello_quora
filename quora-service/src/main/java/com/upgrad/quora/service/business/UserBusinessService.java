@@ -4,6 +4,7 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class UserBusinessService {
 
     @Autowired
     private UserDao userDao;
-
+  
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
@@ -42,7 +43,9 @@ public class UserBusinessService {
         UserEntity persistedUserEntity =  userDao.createUser(userEntity);
 
         return persistedUserEntity;
+
     }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
@@ -66,48 +69,26 @@ public class UserBusinessService {
             userAuthEntity.setLoginAt(now);
             userAuthEntity.setUuid(userEntity.getUuid());
             userDao.createAuthToken(userAuthEntity);
-
-
             return userAuthEntity;
         }
         else {
             throw new AuthenticationFailedException("ATH-002", "Password failed");
         }
-
-
-
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
-        UserEntity userEntity =  userDao.getUserByUsername(username);
-        if(userEntity == null) {
-            throw new AuthenticationFailedException("ATH-001", "User not found");
+    public UserAuthEntity signout(final String accesstoken) throws SignOutRestrictedException {
+
+        UserAuthEntity userAuthEntity = userDao.getUserAuthToken(accesstoken);
+        if(userAuthEntity == null)
+        {
+            throw new SignOutRestrictedException("SGR-001","User is not Signed in");
         }
 
-        final String encryptedPassword = passwordCryptographyProvider.encrypt(password, userEntity.getSalt());
-        if(encryptedPassword.equals(userEntity.getPassword())) {
-            JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
-            UserAuthEntity userAuthEntity = new UserAuthEntity();
-            userAuthEntity.setUser(userEntity);
+        final ZonedDateTime now = ZonedDateTime.now();
+        userAuthEntity.setLogoutAt(now);
+        userDao.updateUserAuth(userAuthEntity);
 
-            final ZonedDateTime now = ZonedDateTime.now();
-            final ZonedDateTime expiresAt = now.plusHours(1);
-
-            userAuthEntity.setAccessToken(jwtTokenProvider.generateToken(userEntity.getUuid(), now, expiresAt));
-            userAuthEntity.setLoginAt(now);
-            userAuthEntity.setExpiresAt(expiresAt);
-            userAuthEntity.setLoginAt(now);
-            userAuthEntity.setUuid(userEntity.getUuid());
-            userDao.createAuthToken(userAuthEntity);
-
-
-            return userAuthEntity;
-        }
-        else {
-            throw new AuthenticationFailedException("ATH-002", "Authentication failed");
-        }
-
-
+        return userAuthEntity;
     }
 }
