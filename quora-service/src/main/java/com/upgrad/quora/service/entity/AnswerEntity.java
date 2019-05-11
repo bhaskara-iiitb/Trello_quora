@@ -19,6 +19,7 @@ import java.sql.Timestamp;
                 @NamedQuery(name = "answersByQuestionid", query = "select u from AnswerEntity u where u.question.id = :id")
         }
 )
+
 public class AnswerEntity implements Serializable {
 
 

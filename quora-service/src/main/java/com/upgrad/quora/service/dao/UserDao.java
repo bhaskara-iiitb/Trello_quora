@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 
+
+
+
 @Repository
 public class UserDao {
 
@@ -17,6 +20,7 @@ public class UserDao {
     public UserEntity createUser(UserEntity userEntity) {
         entityManager.persist(userEntity);
         return userEntity;
+
     }
 
     public UserEntity getUser(final String userUuid) {
@@ -27,13 +31,7 @@ public class UserDao {
         }
     }
 
-    public UserEntity getUserByEmail(final String email) {
-        try {
-            return entityManager.createNamedQuery("userByEmail", UserEntity.class).setParameter("email", email).getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
+
 
     public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
         entityManager.persist(authTokenEntity);
@@ -42,6 +40,7 @@ public class UserDao {
 
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
+
     }
 
     public UserEntity getUserByUsername(final String username) {
@@ -59,11 +58,32 @@ public class UserDao {
 
 
 
-    public UserAuthEntity getUserAuthToken(final String accessToken) {
+
+    public UserEntity getUserByEmail(final String email) {
+
         try {
-            return entityManager.createNamedQuery("userAuthTokenByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
-        } catch (NoResultException e) {
+            return entityManager.createNamedQuery(
+                    "userByEmail", UserEntity.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        }
+        catch(NoResultException nre) {
             return null;
         }
     }
+
+    public UserAuthEntity getUserAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException nre) {
+
+            return null;
+        }
+    }
+
+    public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
+        entityManager.merge(updatedUserAuthEntity);
+    }
+
 }
+

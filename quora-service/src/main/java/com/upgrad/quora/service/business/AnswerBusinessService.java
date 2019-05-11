@@ -4,7 +4,6 @@ import com.upgrad.quora.service.dao.QuestionDao;
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.dao.AnswerDao;
 import com.upgrad.quora.service.entity.AnswerEntity;
-import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
@@ -19,8 +18,6 @@ import java.util.List;
 
 @Service
 public class AnswerBusinessService {
-    @Autowired
-    private QuestionDao questionDao;
 
     @Autowired
     private UserDao userDao;
@@ -95,7 +92,7 @@ public class AnswerBusinessService {
         }
 
         List<AnswerEntity> answerEntities = answerDao.getAnswersByQuestionId(id);
-        if(answerEntities == null){
+        if(answerEntities == null || answerEntities.size() == 0){
             throw new InvalidQuestionException("ANS-002", "No Answer with specified Question Id exist.");
         }
         return answerEntities;
