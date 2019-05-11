@@ -93,6 +93,8 @@ public class UserDao {
         try {
             return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
         } catch (NoResultException e) {
+
+       */
     public UserAuthEntity getUserAuth(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
@@ -100,5 +102,5 @@ public class UserDao {
             return null;
         }
     }
-  */
+
 }
