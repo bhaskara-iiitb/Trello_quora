@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -41,10 +38,9 @@ public class QuestionBusinessService {
         getUserFromToken(authorizationToken);
         List<QuestionEntity> questionEntity = questionDao.getQuestions();
         if(questionEntity == null || questionEntity.size() == 0){
-
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
-        return questionEntity;
+        return questionEntities;
     }
 
     public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
@@ -53,7 +49,7 @@ public class QuestionBusinessService {
         if(questionEntity == null || questionEntity.size() == 0){
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
-        return questionEntity;
+        return questionEntities;
     }
 
 
@@ -100,7 +96,7 @@ public class QuestionBusinessService {
     }
 
     public UserEntity getUserFromToken(String authorizationToken) throws AuthorizationFailedException {
-        UserAuthEntity userAuthTokenEntity = userDao.getUserAuthToken(authorizationToken);
+        UserAuthEntity userAuthTokenEntity = userDao.getUserAuth(authorizationToken);
 
         if(userAuthTokenEntity == null){
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");

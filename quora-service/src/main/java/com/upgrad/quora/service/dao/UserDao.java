@@ -2,52 +2,24 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-
-
-
-
-
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Repository
 public class UserDao {
-
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
     public UserEntity createUser(UserEntity userEntity) {
         entityManager.persist(userEntity);
         return userEntity;
-
     }
-
-
-    public UserEntity getUser(final String userUuid) {
-        try {
-            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-
-
-    public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
-        entityManager.persist(authTokenEntity);
-        return authTokenEntity;
-    }
-
-    public void updateUser(final UserEntity updateUserEntity) {
-        entityManager.merge(updateUserEntity);
-
-    }
-
-
+  
     public UserEntity getUserByUsername(final String username) {
 
         try {
@@ -61,11 +33,19 @@ public class UserDao {
         }
     }
 
-
-
+    /*
+      getUserByUuid - Get UserEntity Object from its UUID
+   */
+    public UserEntity getUserByUuid(final String uuid) {
+        try{
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", uuid).getSingleResult();
+        }
+        catch(NoResultException e) {
+            return null;
+        }
+    }
 
     public UserEntity getUserByEmail(final String email) {
-
         try {
             return entityManager.createNamedQuery(
                     "userByEmail", UserEntity.class)
@@ -77,11 +57,24 @@ public class UserDao {
         }
     }
 
+    public UserAuthEntity createAuthToken(final UserAuthEntity authTokenEntity) {
+        entityManager.persist(authTokenEntity);
+        return authTokenEntity;
+    }
+
+    public UserEntity deleteUser(UserEntity userEntity) {
+        entityManager.remove(userEntity);
+        return userEntity;
+    }
+
+    /*
+        getUserAuthToken - This Method will return the AuthToken for the Signed In User
+     */
     public UserAuthEntity getUserAuthToken(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
-        } catch (NoResultException nre) {
-
+        } 
+        catch (NoResultException nre) {
             return null;
         }
     }
@@ -90,6 +83,22 @@ public class UserDao {
         entityManager.merge(updatedUserAuthEntity);
     }
 
-
+    public void updateUser(final UserEntity updateUserEntity) {
+        entityManager.merge(updateUserEntity);
+    }	
+    // DUPLICATE FUNCTIONALITY
+    // ALREADY TAKEN CARE BY EXISTING FUNCTION IN CODE
+	/*
+    public UserEntity getUser(final String userUuid) {
+        try {
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException e) {
+    public UserAuthEntity getUserAuth(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+  */
 }
-
