@@ -19,7 +19,7 @@ public class UserDao {
         entityManager.persist(userEntity);
         return userEntity;
     }
-
+  
     public UserEntity getUserByUsername(final String username) {
 
         try {
@@ -67,7 +67,6 @@ public class UserDao {
         return userEntity;
     }
 
-
     /*
         getUserAuthToken - This Method will return the AuthToken for the Signed In User
      */
@@ -86,8 +85,7 @@ public class UserDao {
 
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
-    }
-
+    }	
     // DUPLICATE FUNCTIONALITY
     // ALREADY TAKEN CARE BY EXISTING FUNCTION IN CODE
 	/*
@@ -95,8 +93,7 @@ public class UserDao {
         try {
             return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
         } catch (NoResultException e) {
-
-public UserAuthEntity getUserAuth(final String accessToken) {
+    public UserAuthEntity getUserAuth(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
         } catch (NoResultException e) {
@@ -104,5 +101,4 @@ public UserAuthEntity getUserAuth(final String accessToken) {
         }
     }
 */
-	
 }
