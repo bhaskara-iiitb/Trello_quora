@@ -116,7 +116,7 @@ public class UserBusinessService {
     }
 
     public UserEntity getUserFromToken(String authorizationToken) throws AuthorizationFailedException {
-        UserAuthEntity userAuthEntity = userDao.getUserAuth(authorizationToken);
+        UserAuthEntity userAuthEntity = userDao.getUserAuthToken(authorizationToken);
 
         if(userAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
