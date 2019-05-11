@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Repository
 public class UserDao {
-
+    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -33,8 +34,19 @@ public class UserDao {
         }
     }
 
-    public UserEntity getUserByEmail(final String email) {
+    /*
+      getUserByUuid - Get UserEntity Object from its UUID
+   */
+    public UserEntity getUserByUuid(final String uuid) {
+        try{
+            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", uuid).getSingleResult();
+        }
+        catch(NoResultException e) {
+            return null;
+        }
+    }
 
+    public UserEntity getUserByEmail(final String email) {
         try {
             return entityManager.createNamedQuery(
                     "userByEmail", UserEntity.class)
@@ -50,7 +62,6 @@ public class UserDao {
         return authTokenEntity;
     }
 
-
     /*
         getUserAuthToken - This Method will return the AuthToken for the Signed In User
      */
@@ -58,23 +69,15 @@ public class UserDao {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
         } catch (NoResultException nre) {
-
             return null;
         }
     }
 
-    /*
-        getUserByUuid - Get UserEntity Object from its UUID
-     */
+    public void updateUserAuth(final UserAuthEntity updatedUserAuthEntity) {
+        entityManager.merge(updatedUserAuthEntity);
+    }
 
-    public UserEntity getUserByUuid(final String uuid) {
-        try{
-            return entityManager.createNamedQuery("getUserByUuid", UserEntity.class).setParameter("uuid", uuid).getSingleResult();
-        }
-        catch(NoResultException e)
-        {
-            return null;
-        }
-
+    public void updateUser(final UserEntity updateUserEntity) {
+        entityManager.merge(updateUserEntity);
     }
 }
