@@ -27,8 +27,17 @@ public class AnswerBusinessService {
 
     @Autowired
     private AnswerDao answerDao;
+
+    /**
+     * Handle the request to Create an answer
+     * @param answerEntity
+     * @param authorizationToken
+     * @return AnswerEntity
+     * @throws AuthorizationFailedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnswerEntity createAnswer(final AnswerEntity answerEntity, final String authorizationToken) throws AuthorizationFailedException {
+    public AnswerEntity createAnswer(final AnswerEntity answerEntity, final String authorizationToken)
+            throws AuthorizationFailedException {
 
         UserEntity userEntity = userBusinessService.getUserFromToken(authorizationToken);
         answerEntity.setUser(userEntity);
@@ -36,9 +45,16 @@ public class AnswerBusinessService {
         return answerEntity;
     }
 
-
-
-    public AnswerEntity getAnswerByAnswerUuid(final String answerUuid, final String authorizationToken) throws AuthorizationFailedException,AnswerNotFoundException {
+    /**
+     * Handle the request to retrieve the Answer from its uuid
+     * @param answerUuid
+     * @param authorizationToken
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws AnswerNotFoundException
+     */
+    public AnswerEntity getAnswerByAnswerUuid(final String answerUuid, final String authorizationToken)
+            throws AuthorizationFailedException,AnswerNotFoundException {
 
         userBusinessService.getUserFromToken(authorizationToken);
         AnswerEntity answerEntity = answerDao.getAnswerByUuid(answerUuid);
@@ -48,10 +64,16 @@ public class AnswerBusinessService {
         return answerEntity;
     }
 
-
-
+    /**
+     * Hande the request to update an Answer
+     * @param answerEntity
+     * @param authorizationToken
+     * @return AnswerEntity
+     * @throws AuthorizationFailedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnswerEntity updateAnswer(final AnswerEntity answerEntity, final String authorizationToken) throws AuthorizationFailedException {
+    public AnswerEntity updateAnswer(final AnswerEntity answerEntity, final String authorizationToken)
+            throws AuthorizationFailedException {
 
         UserEntity userEntity = userBusinessService.getUserFromToken(authorizationToken);
 
@@ -64,7 +86,14 @@ public class AnswerBusinessService {
         return answerEntity;
     }
 
-
+    /**
+     * Handle the request to delete an Answer
+     * @param answerUuid
+     * @param authorizationToken
+     * @return AnswerEntity
+     * @throws AuthorizationFailedException
+     * @throws AnswerNotFoundException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public AnswerEntity deleteAnswer(final String answerUuid, final String authorizationToken) throws AuthorizationFailedException,AnswerNotFoundException {
 
@@ -84,6 +113,14 @@ public class AnswerBusinessService {
         return answerEntity;
     }
 
+    /**
+     * Handle the request to retrieve all the Answers given to a given  question
+     * @param id
+     * @param authorizationToken
+     * @return List<AnswerEntity>
+     * @throws AuthorizationFailedException
+     * @throws InvalidQuestionException
+     */
     public List<AnswerEntity> getAllAnswersByQuestionId (final Integer id,final String authorizationToken) throws AuthorizationFailedException,InvalidQuestionException{
         userBusinessService.getUserFromToken(authorizationToken);
 
