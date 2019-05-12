@@ -61,21 +61,35 @@ public class UserController {
 
     public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
-        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
-        String decodedText = new String(decode);
-        String[] decodedArray = decodedText.split(":");
+      try {
+            byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+            String decodedText = new String(decode);
+            String[] decodedArray = decodedText.split(":");
 
-        final UserAuthEntity userAuthEntity = userBusinessService.signin(decodedArray[0], decodedArray[1]);
-        UserEntity userEntity = userAuthEntity.getUser();
+            final UserAuthEntity userAuthEntity = userBusinessService.signin(decodedArray[0], decodedArray[1]);
+            UserEntity userEntity = userAuthEntity.getUser();
 
-        SigninResponse signinResponse = new SigninResponse()
-                .id(UUID.fromString(userEntity.getUuid()).toString())
-                .message("Authenticated successfully");
+            SigninResponse signinResponse = new SigninResponse()
+                    .id(UUID.fromString(userEntity.getUuid()).toString())
+                    .message("Authenticated successfully");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("access-token", userAuthEntity.getAccessToken());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("access-token", userAuthEntity.getAccessToken());
 
-        return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
+            return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
+        }
+        catch(ArrayIndexOutOfBoundsException aioe) {
+            String exceptMsg = aioe.getMessage();
+
+            throw new AuthenticationFailedException("ATH-102",
+                    "Authentication failed - Invalid Credential input");
+        }
+        catch(IllegalArgumentException iae) {
+            String exceptMsg = iae.getMessage();
+
+            throw new AuthenticationFailedException("ATH-102",
+                    "Authentication failed - Invalid Credential input");
+        }
     }
 
 
