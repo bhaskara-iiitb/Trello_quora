@@ -6,6 +6,7 @@ import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,12 +46,15 @@ public class QuestionBusinessService {
         return questionEntities;
     }
 
-    public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
+    public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException, UserNotFoundException {
         userBusinessService.getUserFromToken(authorizationToken);
-        List<QuestionEntity> questionEntities = questionDao.getQuestionsByUser(uuid);
-        if(questionEntities == null || questionEntities.size() == 0){
-            throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
+        UserEntity userEntity = userDao.getUserByUuid(uuid);
+        if (userEntity == null) {
+            throw new UserNotFoundException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
+
+        List<QuestionEntity> questionEntities = questionDao.getQuestionsByUser(uuid);
+
         return questionEntities;
     }
 
