@@ -15,8 +15,8 @@ import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.api.model.QuestionDeleteResponse;
 import com.upgrad.quora.api.model.QuestionEditRequest;
+import com.upgrad.quora.api.model.QuestionEditResponse;
 
-import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class QuestionController {
             path="/create",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionResponse> createQuestion(final QuestionRequest questionRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<QuestionResponse> createQuestion(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws AuthorizationFailedException {
         QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setUuid(UUID.randomUUID().toString());
         questionEntity.setContent(questionRequest.getContent());
@@ -53,14 +53,7 @@ public class QuestionController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
         List<QuestionEntity> questionEntities = questionBusinessService.getAllQuestions(authorization);
-        List<QuestionDetailsResponse> questionResponses = new ArrayList<>();
-        for (QuestionEntity questionEntity : questionEntities) {
-            questionResponses.add(
-                    new QuestionDetailsResponse()
-                            .id(questionEntity.getUuid())
-                            .content(questionEntity.getContent())
-            ) ;
-        }
+        List<QuestionDetailsResponse> questionResponses = entitiesToResponse(questionEntities);
 
         return new ResponseEntity(questionResponses, HttpStatus.OK);
     }
@@ -70,7 +63,7 @@ public class QuestionController {
             path="/edit/{questionId}",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionResponse> editQuestionContent (final QuestionRequest questionRequest, @PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+    public ResponseEntity<QuestionEditResponse> editQuestionContent (@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId, final QuestionEditRequest questionRequest) throws AuthorizationFailedException, InvalidQuestionException {
 
         QuestionEntity questionEntity = questionBusinessService.getQuestion(questionId);
         questionEntity.setContent(questionRequest.getContent());
@@ -78,27 +71,33 @@ public class QuestionController {
         questionEntity.setDate(date);
 
         QuestionEntity updatedQuestionEntity = questionBusinessService.updateQuestion(questionEntity, authorization);
-        QuestionResponse questionResponse = new QuestionResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION EDITED");
+        QuestionEditResponse questionResponse = new QuestionEditResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION EDITED");
 
-        return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.OK);
+        return new ResponseEntity<QuestionEditResponse>(questionResponse, HttpStatus.OK);
     }
 
 
     @RequestMapping(method = RequestMethod.DELETE,
             path="/delete/{questionId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionResponse> deleteQuestion(@PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+    public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId) throws AuthorizationFailedException, InvalidQuestionException {
         QuestionEntity updatedQuestionEntity = questionBusinessService.deleteQuestion(questionId, authorization);
-        QuestionResponse questionResponse = new QuestionResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION DELETED");
+        QuestionDeleteResponse questionResponse = new QuestionDeleteResponse().id(updatedQuestionEntity.getUuid()).status("QUESTION DELETED");
 
-        return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.OK);
+        return new ResponseEntity<QuestionDeleteResponse>(questionResponse, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET,
             path="/all/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@RequestHeader("authorization") final String authorization, @PathVariable("userId") final String userId) throws AuthorizationFailedException, InvalidQuestionException {
         List<QuestionEntity> questionEntities = questionBusinessService.getAllQuestionsByUser(userId, authorization);
+        List<QuestionDetailsResponse> questionResponses = entitiesToResponse(questionEntities);
+
+        return new ResponseEntity(questionResponses, HttpStatus.OK);
+    }
+
+    private List<QuestionDetailsResponse> entitiesToResponse(List<QuestionEntity> questionEntities) {
         List<QuestionDetailsResponse> questionResponses = new ArrayList<>();
         for (QuestionEntity questionEntity : questionEntities) {
             questionResponses.add(
@@ -108,6 +107,6 @@ public class QuestionController {
             ) ;
         }
 
-        return new ResponseEntity(questionResponses, HttpStatus.OK);
+        return questionResponses;
     }
 }

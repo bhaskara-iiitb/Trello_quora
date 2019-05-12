@@ -3,10 +3,10 @@ package com.upgrad.quora.service.business;
 import com.upgrad.quora.service.dao.QuestionDao;
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.QuestionEntity;
-import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,10 +23,13 @@ public class QuestionBusinessService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserBusinessService userBusinessService;
+
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity createQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
 
-        UserEntity userEntity = getUserFromToken(authorizationToken);
+        UserEntity userEntity = userBusinessService.getUserFromToken(authorizationToken);
         questionEntity.setUser(userEntity);
 
         questionDao.createQuestion(questionEntity);
@@ -35,7 +38,7 @@ public class QuestionBusinessService {
     }
 
     public List<QuestionEntity> getAllQuestions (final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
-        getUserFromToken(authorizationToken);
+        userBusinessService.getUserFromToken(authorizationToken);
         List<QuestionEntity> questionEntities = questionDao.getQuestions();
         if(questionEntities == null || questionEntities.size() == 0){
             throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
@@ -43,12 +46,15 @@ public class QuestionBusinessService {
         return questionEntities;
     }
 
-    public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException {
-        getUserFromToken(authorizationToken);
-        List<QuestionEntity> questionEntities = questionDao.getQuestionsByUser(uuid);
-        if(questionEntities == null || questionEntities.size() == 0){
-            throw new InvalidQuestionException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
+    public List<QuestionEntity> getAllQuestionsByUser (final String uuid, final String authorizationToken) throws InvalidQuestionException, AuthorizationFailedException, UserNotFoundException {
+        userBusinessService.getUserFromToken(authorizationToken);
+        UserEntity userEntity = userDao.getUserByUuid(uuid);
+        if (userEntity == null) {
+            throw new UserNotFoundException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
+
+        List<QuestionEntity> questionEntities = questionDao.getQuestionsByUser(uuid);
+
         return questionEntities;
     }
 
@@ -56,7 +62,7 @@ public class QuestionBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity updateQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
 
-        UserEntity userEntity = getUserFromToken(authorizationToken);
+        UserEntity userEntity = userBusinessService.getUserFromToken(authorizationToken);
 
         if(questionEntity.getUser().getId() == userEntity.getId()) {
             questionDao.updateQuestion(questionEntity);
@@ -70,7 +76,7 @@ public class QuestionBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity deleteQuestion(final String uuid, final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
 
-        UserEntity userEntity = getUserFromToken(authorizationToken);
+        UserEntity userEntity = userBusinessService.getUserFromToken(authorizationToken);
         QuestionEntity questionEntity = questionDao.getQuestion(uuid);
         if(questionEntity == null){
             throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
@@ -93,19 +99,5 @@ public class QuestionBusinessService {
         }
 
         return questionEntity;
-    }
-
-    public UserEntity getUserFromToken(String authorizationToken) throws AuthorizationFailedException {
-        UserAuthEntity userAuthTokenEntity = userDao.getUserAuth(authorizationToken);
-
-        if(userAuthTokenEntity == null){
-            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-        } else if(userAuthTokenEntity.getLogoutAt() != null ){ // && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0
-            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
-        }
-
-        UserEntity userEntity = userAuthTokenEntity.getUser();
-
-        return userEntity;
     }
 }

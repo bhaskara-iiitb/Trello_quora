@@ -159,7 +159,7 @@ public class UserBusinessService {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
         else if(userAuthEntity.getLogoutAt() != null ){
-            throw new AuthorizationFailedException("ATHR-002", "User has already signed out");
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out");
         }
 
         UserEntity userEntity = userAuthEntity.getUser();
