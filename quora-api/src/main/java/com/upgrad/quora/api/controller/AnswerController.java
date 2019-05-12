@@ -55,7 +55,7 @@ public class AnswerController {
         answerEntity.setDate(date);
 
         final AnswerEntity createdAnswerEntity = answerBusinessService.createAnswer(answerEntity,authorization);
-        final AnswerResponse answerResponse = new AnswerResponse().id(createdAnswerEntity.getUuid()).status("QUESTION CREATED");
+        final AnswerResponse answerResponse = new AnswerResponse().id(createdAnswerEntity.getUuid()).status("ANSWER CREATED");
 
         return new ResponseEntity<AnswerResponse>(answerResponse,HttpStatus.CREATED);
 
