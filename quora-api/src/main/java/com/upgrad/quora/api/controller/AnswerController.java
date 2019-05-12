@@ -35,7 +35,6 @@ import java.util.UUID;
 @RequestMapping("/")
 public class AnswerController {
 
-
     @Autowired
     private AnswerBusinessService answerBusinessService;
 
@@ -103,7 +102,7 @@ public class AnswerController {
     @RequestMapping(method = RequestMethod.GET,
             path="answer/all/{questionId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-        public ResponseEntity<Object> getAllAnswerToQuestion( @RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionUuid) throws  AuthorizationFailedException,InvalidQuestionException {
+        public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswerToQuestion( @RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionUuid) throws  AuthorizationFailedException,InvalidQuestionException {
         // First get question using questionUuid, then find the questionId and for that question Id get all the answers.
         QuestionEntity quesEntity = questionBusinessService.getQuestion(questionUuid);
 

@@ -120,7 +120,7 @@ public class UserBusinessService {
 
         if(userAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-        } else if(userAuthEntity.getLogoutAt() != null ){ // && userAuthTokenEntity.getLogoutAt().compareTo(ZonedDateTime.now()) > 0 // IS THIS COMMENTED TEXT A TODO? - NEED TO VALIDATE
+        } else if(userAuthEntity.getLogoutAt() != null ){
             throw new AuthorizationFailedException("ATHR-002", "User is signed out");
         }
 
