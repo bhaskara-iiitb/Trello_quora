@@ -1,6 +1,11 @@
 package com.upgrad.quora.api.controller;
 
-import com.upgrad.quora.api.model.*;
+import com.upgrad.quora.api.model.AnswerResponse;
+import com.upgrad.quora.api.model.AnswerRequest;
+import com.upgrad.quora.api.model.AnswerEditRequest;
+import com.upgrad.quora.api.model.AnswerEditResponse;
+import com.upgrad.quora.api.model.AnswerDeleteResponse;
+import com.upgrad.quora.api.model.AnswerDetailsResponse;
 
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.AnswerEntity;
@@ -26,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
-
 @RestController
 @RequestMapping("/")
 public class AnswerController {
@@ -43,7 +46,7 @@ public class AnswerController {
             path="question/{questionId}/answer/create",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerResponse> createAnswer(@RequestHeader("authorization") final String authorization,@PathVariable("questionId") final String questionUuid,  AnswerRequest request) throws AuthorizationFailedException, InvalidQuestionException {
+    public ResponseEntity<AnswerResponse> createAnswer(@RequestHeader("authorization") final String authorization,@PathVariable("questionId") final String questionUuid, final AnswerRequest request) throws AuthorizationFailedException, InvalidQuestionException {
 
         QuestionEntity quesEntity = questionBusinessService.getQuestion(questionUuid);
 
@@ -55,7 +58,7 @@ public class AnswerController {
         answerEntity.setDate(date);
 
         final AnswerEntity createdAnswerEntity = answerBusinessService.createAnswer(answerEntity,authorization);
-        final AnswerResponse answerResponse = new AnswerResponse().id(createdAnswerEntity.getUuid()).status("QUESTION CREATED");
+        final AnswerResponse answerResponse = new AnswerResponse().id(createdAnswerEntity.getUuid()).status("ANSWER CREATED");
 
         return new ResponseEntity<AnswerResponse>(answerResponse,HttpStatus.CREATED);
 
