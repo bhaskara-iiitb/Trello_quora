@@ -17,6 +17,14 @@ public class AdminBusinessService {
     @Autowired
     private UserBusinessService userBusinessService;
 
+    /**
+     * Business login to handle the user delete request. Only Admin user can delete another user in the application
+     * @param String uuid
+     * @param String authorizationToken
+     * @return UserEntity
+     * @throws AuthorizationFailedException
+     * @throws UserNotFoundException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity deleteUser(final String uuid, final String authorizationToken) throws AuthorizationFailedException, UserNotFoundException {
 

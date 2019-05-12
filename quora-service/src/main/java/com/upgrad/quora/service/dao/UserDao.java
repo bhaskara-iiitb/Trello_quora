@@ -7,11 +7,10 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Repository
 public class UserDao {
+
     @PersistenceContext
     private EntityManager entityManager;
 
