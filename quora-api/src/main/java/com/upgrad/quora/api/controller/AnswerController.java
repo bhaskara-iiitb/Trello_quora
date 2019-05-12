@@ -68,7 +68,7 @@ public class AnswerController {
             path="answer/edit/{answerId}",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerEditResponse> editAnswerContent(@PathVariable("answerId") final String answerUuid, @RequestHeader("authorization") final String authorization, AnswerEditRequest editRequest)throws AuthorizationFailedException,AnswerNotFoundException{
+    public ResponseEntity<AnswerEditResponse> editAnswerContent(@RequestHeader("authorization") final String authorization,@PathVariable("answerId") final String answerUuid,  AnswerEditRequest editRequest)throws AuthorizationFailedException,AnswerNotFoundException{
         // 1. First Get the Answer.
         // 2. Then update the Answer Content
         // Finally update Answer in DB.
@@ -88,7 +88,7 @@ public class AnswerController {
     @RequestMapping(method = RequestMethod.DELETE,
             path="answer/delete/{answerId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@PathVariable("answerId") final String answerUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
+    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@RequestHeader("authorization") final String authorization, @PathVariable("answerId") final String answerUuid) throws AuthorizationFailedException, AnswerNotFoundException {
         // Who all are allowed to delete the answer only user or admin as well.
         //
         AnswerEntity updatedAnswerEntity = answerBusinessService.deleteAnswer(answerUuid, authorization);
