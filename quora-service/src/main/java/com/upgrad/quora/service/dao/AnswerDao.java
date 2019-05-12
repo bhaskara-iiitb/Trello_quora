@@ -13,19 +13,13 @@ import java.util.List;
 @Repository
 public class AnswerDao {
 
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
-
-
-
 
     public AnswerEntity createAnswer(AnswerEntity answerEntity) {
         entityManager.persist(answerEntity);
         return answerEntity;
     }
-
-
 
     public AnswerEntity getAnswerByUuid(final String Uuid) {
         try {
@@ -35,7 +29,6 @@ public class AnswerDao {
         }
     }
 
-
     public List<AnswerEntity> getAnswersByQuestionId(final Integer id) {
         try {
             return entityManager.createNamedQuery("answersByQuestionid", AnswerEntity.class).setParameter("id", id).getResultList();
@@ -43,7 +36,6 @@ public class AnswerDao {
             return null;
         }
     }
-
 
     public AnswerEntity updateAnswer(AnswerEntity answerEntity) {
         entityManager.merge(answerEntity);

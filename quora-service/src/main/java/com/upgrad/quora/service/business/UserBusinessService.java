@@ -24,7 +24,12 @@ public class UserBusinessService {
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
-
+    /**
+     * Business login to handle the user signin requests
+     * @param UserEntity
+     * @return UserEntity
+     * @throws SignUpRestrictedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity signup(UserEntity userEntity) throws SignUpRestrictedException {
         UserEntity existingUsername = userDao.getUserByUsername(userEntity.getUsername());
@@ -39,6 +44,7 @@ public class UserBusinessService {
                     " emailId");
         }
 
+        //encrypt the user password, split the encrypted code into salt and text and assign to the UserEntity object
         String[] encryptedText = passwordCryptographyProvider.encrypt(userEntity.getPassword());
         userEntity.setSalt(encryptedText[0]);
         userEntity.setPassword(encryptedText[1]);
@@ -48,7 +54,13 @@ public class UserBusinessService {
 
     }
 
-
+    /**
+     * Business logic to handle the user signin requests
+     * @param String username
+     * @param String password
+     * @return UserAuthEntity
+     * @throws AuthenticationFailedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity signin(final String username, final String password) throws AuthenticationFailedException {
         UserEntity userEntity = userDao.getUserByUsername(username);
@@ -56,12 +68,16 @@ public class UserBusinessService {
             throw new AuthenticationFailedException("ATH-001", "This username does not exist");
         }
 
+        // encrypt the password provided by the user during login using the salt stored in the database for that user
         final String encryptedPassword = passwordCryptographyProvider.encrypt(password, userEntity.getSalt());
+        //check if the encrypted form of user provided password is equal to encrypted password store in the database
         if(encryptedPassword.equals(userEntity.getPassword())) {
+            // generate a JWT Auth Token for the user signin
             JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
             UserAuthEntity userAuthEntity = new UserAuthEntity();
             userAuthEntity.setUser(userEntity);
 
+            //set expiry time as one hour for the auth token
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime expiresAt = now.plusHours(1);
 
@@ -78,12 +94,17 @@ public class UserBusinessService {
         }
     }
 
-    /*
-        getUserProfile -  This method will return the Details of the Signed in User
+    /**
+     * Business login to retrieve the Details of a Signed-in User
+     * @param String userUuid
+     * @param String accesstoken
+     * @return
+     * @throws AuthorizationFailedException
+     * @throws UserNotFoundException
      */
-    public UserEntity getUserProfile(final String userUuid, final String acesstoken) throws AuthorizationFailedException, UserNotFoundException {
+    public UserEntity getUserProfile(final String userUuid, final String accesstoken) throws AuthorizationFailedException, UserNotFoundException {
 
-        UserAuthEntity userAuthEntity = userDao.getUserAuthToken(acesstoken);
+        UserAuthEntity userAuthEntity = userDao.getUserAuthToken(accesstoken);
         if(userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
@@ -100,11 +121,21 @@ public class UserBusinessService {
         throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
     }
 
+    /**
+     * Business login to handle the user sign out requests
+     * @param accesstoken
+     * @return
+     * @throws SignOutRestrictedException
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity signout(final String accesstoken) throws SignOutRestrictedException {
 
         UserAuthEntity userAuthEntity = userDao.getUserAuthToken(accesstoken);
-        if(userAuthEntity == null) {
+
+        // User is considered as actively signed-in only if Auth token is available in the database and
+        // user logout time is not filled-in in the database
+
+        if(userAuthEntity == null || userAuthEntity.getLogoutAt()!=null) {
             throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
         }
 
@@ -115,12 +146,19 @@ public class UserBusinessService {
         return userAuthEntity;
     }
 
+    /**
+     * Utility method to retrieve the user auth token from the database
+     * @param authorizationToken
+     * @return
+     * @throws AuthorizationFailedException
+     */
     public UserEntity getUserFromToken(String authorizationToken) throws AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userDao.getUserAuthToken(authorizationToken);
 
         if(userAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-        } else if(userAuthEntity.getLogoutAt() != null ){
+        }
+        else if(userAuthEntity.getLogoutAt() != null ){
             throw new AuthorizationFailedException("ATHR-002", "User is signed out");
         }
 

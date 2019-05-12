@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public class QuestionDao {
 
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
