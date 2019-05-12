@@ -86,15 +86,7 @@ public class UserDao {
     public void updateUser(final UserEntity updateUserEntity) {
         entityManager.merge(updateUserEntity);
     }	
-    // DUPLICATE FUNCTIONALITY
-    // ALREADY TAKEN CARE BY EXISTING FUNCTION IN CODE
-	/*
-    public UserEntity getUser(final String userUuid) {
-        try {
-            return entityManager.createNamedQuery("userByUuid", UserEntity.class).setParameter("uuid", userUuid).getSingleResult();
-        } catch (NoResultException e) {
 
-       */
     public UserAuthEntity getUserAuth(final String accessToken) {
         try {
             return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class).setParameter("accessToken", accessToken).getSingleResult();
